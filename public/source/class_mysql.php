@@ -11,37 +11,32 @@ if(!defined('IN_UCHOME')) {
 class dbstuff {
 	var $querynum = 0;
 	var $link;
-	var $charset;
+	var $charset='utf-8';
 	function connect($dbhost, $dbuser, $dbpw, $dbname = '', $pconnect = 0, $halt = TRUE) {
-		if($pconnect) {
-			if(!$this->link = @mysql_pconnect($dbhost, $dbuser, $dbpw)) {
-				$halt && $this->halt('Can not connect to MySQL server');
-			}
-		} else {
-			if(!$this->link = @mysql_connect($dbhost, $dbuser, $dbpw, 1)) {
-				$halt && $this->halt('Can not connect to MySQL server');
-			}
-		}
 
+		if(!$this->link = mysqli_connect($dbhost, $dbuser, $dbpw)) {
+			$halt && $this->halt('Can not connect to MySQL server');
+		}
+		
 		if($this->version() > '4.1') {
 			if($this->charset) {
-				@mysql_query("SET character_set_connection=$this->charset, character_set_results=$this->charset, character_set_client=binary", $this->link);
+				mysqli_query($this->link, "SET character_set_connection=$this->charset, character_set_results=$this->charset, character_set_client=binary");
 			}
 			if($this->version() > '5.0.1') {
-				@mysql_query("SET sql_mode=''", $this->link);
+				mysqli_query($this->link, "SET sql_mode=''");
 			}
 		}
 		if($dbname) {
-			@mysql_select_db($dbname, $this->link);
+			mysqli_select_db($this->link, $dbname);
 		}
 	}
 
 	function select_db($dbname) {
-		return mysql_select_db($dbname, $this->link);
+		return mysqli_select_db($this->link, $dbname);
 	}
 
-	function fetch_array($query, $result_type = MYSQL_ASSOC) {
-		return mysql_fetch_array($query, $result_type);
+	function fetch_array($query, $result_type = MYSQLI_ASSOC) {
+		return mysqli_fetch_array($query, $result_type);
 	}
 
 	function query($sql, $type = '') {
@@ -51,9 +46,8 @@ class dbstuff {
 			$mtime = explode(' ', microtime());
 			$sqlstarttime = number_format(($mtime[1] + $mtime[0] - $_SGLOBAL['supe_starttime']), 6) * 1000;
 		}
-		$func = $type == 'UNBUFFERED' && @function_exists('mysql_unbuffered_query') ?
-			'mysql_unbuffered_query' : 'mysql_query';
-		if(!($query = $func($sql, $this->link)) && $type != 'SILENT') {
+		$resultmode = $type == 'UNBUFFERED' ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT;
+		if(!($query = mysqli_query($this->link, $sql, $resultmode)) && $type != 'SILENT') {
 			$this->halt('MySQL Query Error', $sql);
 		}
 		if(D_BUG) {
@@ -62,9 +56,9 @@ class dbstuff {
 			$sqltime = round(($sqlendttime - $sqlstarttime), 3);
 
 			$explain = array();
-			$info = mysql_info();
+			$info = mysqli_info($this->link);
 			if($query && preg_match("/^(select )/i", $sql)) {
-				$explain = mysql_fetch_assoc(mysql_query('EXPLAIN '.$sql, $this->link));
+				$explain = mysqli_fetch_assoc(mysqli_query($this->link, 'EXPLAIN '.$sql));
 			}
 			$_SGLOBAL['debug_query'][] = array('sql'=>$sql, 'time'=>$sqltime, 'info'=>$info, 'explain'=>$explain);
 		}
@@ -73,54 +67,55 @@ class dbstuff {
 	}
 
 	function affected_rows() {
-		return mysql_affected_rows($this->link);
+		return mysqli_affected_rows($this->link);
 	}
 
 	function error() {
-		return (($this->link) ? mysql_error($this->link) : mysql_error());
+		return (empty($this->link) ?'mysqli_link_empty': mysqli_error($this->link) );
 	}
 
 	function errno() {
-		return intval(($this->link) ? mysql_errno($this->link) : mysql_errno());
+		return empty($this->link) ?0: intval(mysqli_errno ($this->link) );
 	}
 
 	function result($query, $row) {
-		$query = @mysql_result($query, $row);
-		return $query;
+		mysqli_data_seek($query, $row);
+		$f = mysqli_fetch_array( $query );
+		return $f[0];
 	}
 
 	function num_rows($query) {
-		$query = mysql_num_rows($query);
+		$query = mysqli_num_rows($query);
 		return $query;
 	}
 
 	function num_fields($query) {
-		return mysql_num_fields($query);
+		return mysqli_num_fields($query);
 	}
 
 	function free_result($query) {
-		return mysql_free_result($query);
+		return mysqli_free_result($query);
 	}
 
 	function insert_id() {
-		return ($id = mysql_insert_id($this->link)) >= 0 ? $id : $this->result($this->query("SELECT last_insert_id()"), 0);
+		return ($id = mysqli_insert_id($this->link)) >= 0 ? $id : $this->result($this->query("SELECT last_insert_id()"), 0);
 	}
 
 	function fetch_row($query) {
-		$query = mysql_fetch_row($query);
+		$query = mysqli_fetch_row($query);
 		return $query;
 	}
 
 	function fetch_fields($query) {
-		return mysql_fetch_field($query);
+		return mysqli_fetch_field($query);
 	}
 
 	function version() {
-		return mysql_get_server_info($this->link);
+		return mysqli_get_server_info($this->link);
 	}
 
 	function close() {
-		return mysql_close($this->link);
+		return mysqli_close($this->link);
 	}
 
 	function halt($message = '', $sql = '') {

@@ -69,7 +69,7 @@ class Zip {
 	var $error_string = '';
 	var $magic_quotes_status;
 
-	function Zip($p_zipname) {
+	function __construct($p_zipname) {
 		if(!function_exists('gzopen')) {
 			die('Abort '.basename(__FILE__).': Missing zlib extensions');
 		}
@@ -696,7 +696,7 @@ class SimpleUnzip {
 
         var $Time = 0;
 
-        function SimpleUnzip($in_FileName = '') {
+        function __construct($in_FileName = '') {
             if($in_FileName !== '') {
                 SimpleUnzip::ReadFile($in_FileName);
             }
@@ -904,7 +904,7 @@ class SimpleUnzipEntry {
 
         var $Time = 0;
 
-        function SimpleUnzipEntry($in_Entry) {
+        function __construct($in_Entry) {
 		$this->Data     = $in_Entry['D'];
 		$this->Error    = $in_Entry['E'];
 		$this->ErrorMsg = $in_Entry['EM'];

@@ -28,21 +28,24 @@ function parse_template($tpl) {
 	if(empty($template)) {
 		exit("Template file : $tplfile Not found or have no access!");
 	}
-
+	
 	//模板
-	$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
+	//$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function ($match){ return readtemplate($match[1]);}, $template);
 	//处理子页面中的代码
-	$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function($match){ return readtemplate($match[1]);}, $template);
 	//解析模块调用
-	$template = preg_replace("/\<\!\-\-\{block\/(.+?)\}\-\-\>/ie", "blocktags('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{block\/(.+?)\}\-\-\>/i", function($match){ return blocktags($match[1]);}, $template);
 	//解析广告
-	$template = preg_replace("/\<\!\-\-\{ad\/(.+?)\}\-\-\>/ie", "adtags('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{ad\/(.+?)\}\-\-\>/i", function($match){ return adtags($match[1]);}, $template);
 	//时间处理
-	$template = preg_replace("/\<\!\-\-\{date\((.+?)\)\}\-\-\>/ie", "datetags('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{date\((.+?)\)\}\-\-\>/i", function($match){ return datetags($match[1]);}, $template);
 	//头像处理
-	$template = preg_replace("/\<\!\-\-\{avatar\((.+?)\)\}\-\-\>/ie", "avatartags('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{avatar\((.+?)\)\}\-\-\>/i", function($match){ return avatartags($match[1]);}, $template);
 	//PHP代码
-	$template = preg_replace("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", "evaltags('\\1')", $template);
+ 	//preg_match_all("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", $template,$arr);var_dump($arr);exit();
+	//$template = preg_replace("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", "evaltags('\\1')", $template);
+	$template = preg_replace_callback("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/is", function($match){ return evaltags($match[1]);}, $template);
 
 	//开始处理
 	//变量

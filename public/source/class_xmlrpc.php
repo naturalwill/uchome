@@ -28,10 +28,6 @@ class xmlrpc {
 		$this->timestamp = $_SGLOBAL['timestamp'];
 	}
 
-	function xmlrpc() {
-		$this->__construct();
-	}
-
 	function xmlrpcSet() {
 		return new xmlrpc();
 	}

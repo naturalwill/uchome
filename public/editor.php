@@ -14,7 +14,7 @@ if(empty($_GET['op'])) {
 ?>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset=<?=$_GET['charset']?>" />
+<meta http-equiv="Content-Type" content="text/html;charset=<?php echo $_GET['charset']?>" />
 <title>Editor</title>
 <script language="javascript" src="image/editor/editor_base.js"></script>
 <style type="text/css">
@@ -286,9 +286,9 @@ function fontsize(size,obj){format('fontsize',size);obj.parentNode.style.display
 		window.frames['HtmlEditor'].document.body.innerHTML = inihtml;
 	}
 	if(document.all){
-		document.write('<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" id="divEditor"><tr><td style=""><IFRAME class="HtmlEditor" ID="HtmlEditor" name="HtmlEditor" style="height:100%;width:100%" frameBorder="0" marginHeight=0 marginWidth=0 src="editor.php?op=blank&charset=<?=$_GET['charset']?>" onload="blank_load();"></IFRAME></td></tr></table>');
+		document.write('<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" id="divEditor"><tr><td style=""><IFRAME class="HtmlEditor" ID="HtmlEditor" name="HtmlEditor" style="height:100%;width:100%" frameBorder="0" marginHeight=0 marginWidth=0 src="editor.php?op=blank&charset=<?php echo $_GET['charset']?>" onload="blank_load();"></IFRAME></td></tr></table>');
 	}else{
-		document.write('<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" id="divEditor"><tr><td style="background-color:#ffffff"><IFRAME class="HtmlEditor" ID="HtmlEditor" name="HtmlEditor" style="height:100%;width:100%;margin-left:1px;margin-bottom:1px;" frameBorder="0" marginHeight=0 marginWidth=0 src="editor.php?op=blank&charset=<?=$_GET['charset']?>" onload="blank_load();"></IFRAME></td></tr></table>');
+		document.write('<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" id="divEditor"><tr><td style="background-color:#ffffff"><IFRAME class="HtmlEditor" ID="HtmlEditor" name="HtmlEditor" style="height:100%;width:100%;margin-left:1px;margin-bottom:1px;" frameBorder="0" marginHeight=0 marginWidth=0 src="editor.php?op=blank&charset=<?php echo $_GET['charset']?>" onload="blank_load();"></IFRAME></td></tr></table>');
 	}
 //-->
 </SCRIPT>
@@ -312,7 +312,7 @@ function fontsize(size,obj){format('fontsize',size);obj.parentNode.style.display
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html;charset=<?=$_GET['charset']?>" />
+<meta http-equiv="Content-Type" content="text/html;charset=<?php echo $_GET['charset']?>" />
 <title>New Document</title>
 <style>
 body { font-size:14px; line-height:1.8em; padding-right: 4px; padding-left: 8px; padding-bottom: 8px; margin: 0px; padding-top: 8px; }
@@ -322,4 +322,4 @@ body { font-size:14px; line-height:1.8em; padding-right: 4px; padding-left: 8px;
 <body>
 </body>
 </html>
-<?}?>
+<?php }

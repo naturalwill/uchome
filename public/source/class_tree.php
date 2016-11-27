@@ -14,7 +14,7 @@ class tree {
 	var $layer = array(-1 => -1);
 	var $parent = array();
 	var $countid = 0;
-	function tree() {}
+	function __construct() {}
 	
 	function setNode($id, $parent, $value) {
 		
