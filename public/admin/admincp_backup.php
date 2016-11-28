@@ -495,7 +495,7 @@ function sqldumptable($table, $startfrom = 0, $currsize = 0) {
 				while($row = $_SGLOBAL['db']->fetch_row($query)) {	//以枚举形式取得行值
 					$dumpsql = $comma = '';
 					for($i = 0; $i < $numfields; ++$i) {
-						$dumpsql .= $comma.($_GET['usehex'] && !empty($row[$i]) && (strexists($tablefields[$i]['Type'], 'char') || strexists($tablefields[$i]['Type'], 'text')) ? '0x'.bin2hex($row[$i]) : '\''.mysql_escape_string($row[$i]).'\'');
+						$dumpsql .= $comma.($_GET['usehex'] && !empty($row[$i]) && (strexists($tablefields[$i]['Type'], 'char') || strexists($tablefields[$i]['Type'], 'text')) ? '0x'.bin2hex($row[$i]) : '\''.$_SGLOBAL['db']->escape_string($row[$i]).'\'');
 						$comma = ',';
 					}
 					if(strlen($dumpsql) + $currsize + strlen($tabledump) + 500 < $filesize ) {
@@ -528,7 +528,7 @@ function sqldumptable($table, $startfrom = 0, $currsize = 0) {
 				while($row = $_SGLOBAL['db']->fetch_row($query)) {
 					$dumpsql = $comma = '';
 					for($i = 0; $i < $numfields; ++$i) {
-						$dumpsql .= $comma.($_GET['usehex'] && !empty($row[$i]) && (strexists($tablefields[$i]['Type'], 'char') || strexists($tablefields[$i]['Type'], 'text')) ? '0x'.bin2hex($row[$i]) : '\''.mysql_escape_string($row[$i]).'\'');
+						$dumpsql .= $comma.($_GET['usehex'] && !empty($row[$i]) && (strexists($tablefields[$i]['Type'], 'char') || strexists($tablefields[$i]['Type'], 'text')) ? '0x'.bin2hex($row[$i]) : '\''.$_SGLOBAL['db']->escape_string($row[$i]).'\'');
 						$comma = ',';
 					}
 					if(strlen($extdumpsql) + $currsize + strlen($tabledump) + 500 < $filesize ) {

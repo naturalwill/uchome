@@ -12,10 +12,6 @@
 class tagcontrol extends base {
 
 	function __construct() {
-		$this->tagcontrol();
-	}
-
-	function tagcontrol() {
 		parent::__construct();
 		$this->init_input();
 		$this->load('tag');

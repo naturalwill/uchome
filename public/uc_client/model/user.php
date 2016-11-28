@@ -15,10 +15,6 @@ class usermodel {
 	var $base;
 
 	function __construct(&$base) {
-		$this->usermodel($base);
-	}
-
-	function usermodel(&$base) {
 		$this->base = $base;
 		$this->db = $base->db;
 	}

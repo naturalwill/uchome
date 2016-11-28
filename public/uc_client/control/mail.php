@@ -12,10 +12,6 @@
 class mailcontrol extends base {
 
 	function __construct() {
-		$this->mailcontrol();
-	}
-
-	function mailcontrol() {
 		parent::__construct();
 		$this->init_input();
 	}

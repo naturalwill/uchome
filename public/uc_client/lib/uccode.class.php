@@ -10,7 +10,7 @@
 class uccode {
 	var $uccodes;
 
-	function uccode() {
+	function __construct() {
 		$this->uccode = array(
 			'pcodecount' => -1,
 			'codecount' => 0,
@@ -29,13 +29,13 @@ class uccode {
 	function complie($message) {
 		$message = htmlspecialchars($message);
 		if(strpos($message, '[/code]') !== FALSE) {
-			$message = preg_replace("/\s*\[code\](.+?)\[\/code\]\s*/ies", "\$this->codedisp('\\1')", $message);
+			$message = preg_replace_callback("/\s*\[code\](.+?)\[\/code\]\s*/ies", function ($matches){return $this->codedisp($matches[1]);}, $message);
 		}
 		if(strpos($message, '[/url]') !== FALSE) {
-			$message = preg_replace("/\[url(=((https?|ftp|gopher|news|telnet|rtsp|mms|callto|bctp|ed2k|thunder|synacast){1}:\/\/|www\.)([^\[\"']+?))?\](.+?)\[\/url\]/ies", "\$this->parseurl('\\1', '\\5')", $message);
+			$message = preg_replace_callback("/\[url(=((https?|ftp|gopher|news|telnet|rtsp|mms|callto|bctp|ed2k|thunder|synacast){1}:\/\/|www\.)([^\[\"']+?))?\](.+?)\[\/url\]/ies", function ($matches){return $this->parseurl($matches[1], $matches[5] );}, $message);
 		}
 		if(strpos($message, '[/email]') !== FALSE) {
-			$message = preg_replace("/\[email(=([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+))?\](.+?)\[\/email\]/ies", "\$this->parseemail('\\1', '\\4')", $message);
+			$message = preg_replace_callback("/\[email(=([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+))?\](.+?)\[\/email\]/ies",function ($matches){return $this->parseemail($matches[1], $matches[4]);}, $message);
 		}
 		$message = str_replace(array(
 			'[/color]', '[/size]', '[/font]', '[/align]', '[b]', '[/b]',

@@ -396,7 +396,7 @@ if($id) {
 
 	//实名
 	realname_get();
-
+	
 	$_TPL['css'] = 'blog';
 	include_once template("space_blog_list");
 }

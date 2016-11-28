@@ -31,7 +31,7 @@ if(submitcheck('valuesubmit')) {
 		'blocksql' => sub_getblocksql($_POST['blocksql'])
 	);
 	
-	if($setarr['blocksql'] && !$_SGLOBAL['db']->query(stripslashes(preg_replace("/\[(\d+)\]/e", "mksqltime('\\1')", $setarr['blocksql'])).' LIMIT 1', 'SILENT')) {
+	if($setarr['blocksql'] && !$_SGLOBAL['db']->query(stripslashes(preg_replace_callback("/\[(\d+)\]/",function ($matches){return mksqltime($matches[1]);}, $setarr['blocksql'])).' LIMIT 1', 'SILENT')) {
 		cpmessage('sql_statements_can_not_be_completed_for_normal', '', 1, array($_SGLOBAL['db']->error(), $_SGLOBAL['db']->errno()));
 	}
 	
@@ -112,7 +112,7 @@ if(empty($_GET['op'])) {
 	//显示结果
 	$colnames = $keys = array();
 	if(!empty($block['blocksql'])) {
-		if($query = $_SGLOBAL['db']->query(preg_replace("/\[(\d+)\]/e", "mksqltime('\\1')", $block['blocksql'])." LIMIT 1", 'SILENT')) {
+		if($query = $_SGLOBAL['db']->query(preg_replace_callback("/\[(\d+)\]/e",function ($matches){return mksqltime($matches[1]);}, $block['blocksql'])." LIMIT 1", 'SILENT')) {
 			$value = $_SGLOBAL['db']->fetch_array($query);
 			foreach ($value as $keyname => $keyvalue) {
 				if(count($keys) < 2) $keys[] = $keyname;

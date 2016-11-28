@@ -31,6 +31,10 @@ class dbstuff {
 		}
 	}
 
+	function escape_string($query) {
+		return mysqli_escape_string($this->link, $query);
+	}
+	
 	function select_db($dbname) {
 		return mysqli_select_db($this->link, $dbname);
 	}

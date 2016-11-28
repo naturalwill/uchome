@@ -19,10 +19,6 @@ define('CHATPMMEMBERLIMIT_ERROR', -7);
 class pmcontrol extends base {
 
 	function __construct() {
-		$this->pmcontrol();
-	}
-
-	function pmcontrol() {
 		parent::__construct();
 		$this->load('user');
 		$this->load('pm');

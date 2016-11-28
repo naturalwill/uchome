@@ -181,7 +181,7 @@ function getcountsql($sqlstring, $rule, $tablename, $where) {
 function getparamsql($paramarr) {
 	global $_SGLOBAL;
 	
-	$paramarr['sql'] = preg_replace("/\[(\d+)\]/e", 'mksqltime(\'\\1\')', $paramarr['sql']);
+	$paramarr['sql'] = preg_replace_callback("/\[(\d+)\]/", function ($matches){return mksqltime($matches[1]);}, $paramarr['sql']);
 
 	$sqlstring ='SELECT'.preg_replace("/^(select)/i", '', str_replace(';', '', trim($paramarr['sql'])));
 	if(empty($paramarr['perpage'])) {

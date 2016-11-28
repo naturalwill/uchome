@@ -40,10 +40,6 @@ class XML {
 	var $failed = FALSE;
 
 	function __construct($isnormal) {
-		$this->XML($isnormal);
-	}
-
-	function XML($isnormal) {
 		$this->isnormal = $isnormal;
 		$this->parser = xml_parser_create('ISO-8859-1');
 		xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);

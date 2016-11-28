@@ -15,10 +15,6 @@ class domainmodel {
 	var $base;
 
 	function __construct(&$base) {
-		$this->domainmodel($base);
-	}
-
-	function domainmodel(&$base) {
 		$this->base = $base;
 		$this->db = $base->db;
 	}

@@ -12,10 +12,6 @@
 class friendcontrol extends base {
 
 	function __construct() {
-		$this->friendcontrol();
-	}
-
-	function friendcontrol() {
 		parent::__construct();
 		$this->init_input();
 		$this->load('friend');

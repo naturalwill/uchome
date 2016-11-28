@@ -12,10 +12,6 @@
 class domaincontrol extends base {
 
 	function __construct() {
-		$this->domaincontrol();
-	}
-
-	function domaincontrol() {
 		parent::__construct();
 		$this->init_input();
 		$this->load('domain');

@@ -28,25 +28,48 @@ function parse_template($tpl) {
 	if(empty($template)) {
 		exit("Template file : $tplfile Not found or have no access!");
 	}
-	
-	//模板
-	//$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
-	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function ($match){ return readtemplate($match[1]);}, $template);
-	//处理子页面中的代码
-	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function($match){ return readtemplate($match[1]);}, $template);
-	//解析模块调用
-	$template = preg_replace_callback("/\<\!\-\-\{block\/(.+?)\}\-\-\>/i", function($match){ return blocktags($match[1]);}, $template);
-	//解析广告
-	$template = preg_replace_callback("/\<\!\-\-\{ad\/(.+?)\}\-\-\>/i", function($match){ return adtags($match[1]);}, $template);
-	//时间处理
-	$template = preg_replace_callback("/\<\!\-\-\{date\((.+?)\)\}\-\-\>/i", function($match){ return datetags($match[1]);}, $template);
-	//头像处理
-	$template = preg_replace_callback("/\<\!\-\-\{avatar\((.+?)\)\}\-\-\>/i", function($match){ return avatartags($match[1]);}, $template);
-	//PHP代码
- 	//preg_match_all("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", $template,$arr);var_dump($arr);exit();
-	//$template = preg_replace("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", "evaltags('\\1')", $template);
-	$template = preg_replace_callback("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/is", function($match){ return evaltags($match[1]);}, $template);
 
+	/*
+	//模板
+	$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
+	//处理子页面中的代码
+	$template = preg_replace("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/ie", "readtemplate('\\1')", $template);
+	//解析模块调用
+	$template = preg_replace("/\<\!\-\-\{block\/(.+?)\}\-\-\>/ie", "blocktags('\\1')", $template);
+	//解析广告
+	$template = preg_replace("/\<\!\-\-\{ad\/(.+?)\}\-\-\>/ie", "adtags('\\1')", $template);
+	//时间处理
+	$template = preg_replace("/\<\!\-\-\{date\((.+?)\)\}\-\-\>/ie", "datetags('\\1')", $template);
+	//头像处理
+	$template = preg_replace("/\<\!\-\-\{avatar\((.+?)\)\}\-\-\>/ie", "avatartags('\\1')", $template);
+	//PHP代码
+	$template = preg_replace("/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/ies", "evaltags('\\1')", $template);
+	*/
+	//模板
+	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function ($matches){ return readtemplate($matches[1]);}, $template);
+	//处理子页面中的代码
+	$template = preg_replace_callback("/\<\!\-\-\{template\s+([a-z0-9_\/]+)\}\-\-\>/i", function($matches){ return readtemplate($matches[1]);}, $template);
+	//解析模块调用
+	$template = preg_replace_callback("/\<\!\-\-\{block\/(.+?)\}\-\-\>/i", function($matches){ return blocktags($matches[1]);}, $template);
+	//解析广告
+	$template = preg_replace_callback("/\<\!\-\-\{ad\/(.+?)\}\-\-\>/i", function($matches){ return adtags($matches[1]);}, $template);
+	//时间处理
+	$template = preg_replace_callback("/\<\!\-\-\{date\((.+?)\)\}\-\-\>/i", function($matches){ return datetags($matches[1]);}, $template);
+	//头像处理
+	$template = preg_replace_callback("/\<\!\-\-\{avatar\((.+?)\)\}\-\-\>/i", function($matches){ return avatartags($matches[1]);}, $template);
+	// PHP代码	
+	$template = preg_replace_callback ( "/\<\!\-\-\{eval\s+(.+?)\s*\}\-\-\>/is", function ($matches) {
+		global $_SGLOBAL;
+		
+		$_SGLOBAL ['i'] ++;
+		$search = "<!--EVAL_TAG_{$_SGLOBAL['i']}-->";
+		$_SGLOBAL ['block_search'] [$_SGLOBAL ['i']] = $search;
+		$_SGLOBAL ['block_replace'] [$_SGLOBAL ['i']] = "<?php " . preg_replace ( "/\<\?\=(\\\$.+?)\?\>/s", "\\1", $matches [1] ) . " ?>";
+		
+		return $search;
+	}, $template );
+
+	
 	//开始处理
 	//变量
 	$var_regexp = "((\\\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)(\[[a-zA-Z0-9_\-\.\"\'\[\]\$\x7f-\xff]+\])*)";
@@ -54,16 +77,28 @@ function parse_template($tpl) {
 	$template = preg_replace("/([\n\r]+)\t+/s", "\\1", $template);
 	$template = preg_replace("/(\\\$[a-zA-Z0-9_\[\]\'\"\$\x7f-\xff]+)\.([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/s", "\\1['\\2']", $template);
 	$template = preg_replace("/\{(\\\$[a-zA-Z0-9_\[\]\'\"\$\.\x7f-\xff]+)\}/s", "<?=\\1?>", $template);
+	/* 
 	$template = preg_replace("/$var_regexp/es", "addquote('<?=\\1?>')", $template);
 	$template = preg_replace("/\<\?\=\<\?\=$var_regexp\?\>\?\>/es", "addquote('<?=\\1?>')", $template);
+	*/
+	$template = preg_replace_callback("/$var_regexp/s", function($matches){ return addquote("<?=$matches[1]?>");}, $template);
+	$template = preg_replace_callback("/\<\?\=\<\?\=$var_regexp\?\>\?\>/s", function($matches){ return addquote("<?=$matches[1]?>");}, $template);
 	//逻辑
+	/*
 	$template = preg_replace("/\{elseif\s+(.+?)\}/ies", "stripvtags('<?php } elseif(\\1) { ?>','')", $template);
+	*/
+	$template = preg_replace_callback("/\{elseif\s+(.+?)\}/is", function($matches){ return stripvtags("<?php } elseif($matches[1]) { ?>",'');}, $template);
 	$template = preg_replace("/\{else\}/is", "<?php } else { ?>", $template);
 	//循环
 	for($i = 0; $i < 6; $i++) {
+		/*
 		$template = preg_replace("/\{loop\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/ies", "stripvtags('<?php if(is_array(\\1)) { foreach(\\1 as \\2) { ?>','\\3<?php } } ?>')", $template);
 		$template = preg_replace("/\{loop\s+(\S+)\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/ies", "stripvtags('<?php if(is_array(\\1)) { foreach(\\1 as \\2 => \\3) { ?>','\\4<?php } } ?>')", $template);
 		$template = preg_replace("/\{if\s+(.+?)\}(.+?)\{\/if\}/ies", "stripvtags('<?php if(\\1) { ?>','\\2<?php } ?>')", $template);
+		*/
+		$template = preg_replace_callback("/\{loop\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/is", function($matches){ return stripvtags("<?php if(is_array($matches[1])) { foreach($matches[1] as $matches[2]) { ?>","$matches[3]<?php } } ?>");}, $template);
+		$template = preg_replace_callback("/\{loop\s+(\S+)\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/is", function($matches){ return stripvtags("<?php if(is_array($matches[1])) { foreach($matches[1] as $matches[2] => $matches[3]) { ?>","$matches[4]<?php } } ?>");}, $template);
+		$template = preg_replace_callback("/\{if\s+(.+?)\}(.+?)\{\/if\}/is", function($matches){ return stripvtags("<?php if($matches[1]) { ?>","$matches[2]<?php } ?>");}, $template);
 	}
 	//常量
 	$template = preg_replace("/\{([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\}/s", "<?=\\1?>", $template);
@@ -97,12 +132,12 @@ function striptagquotes($expr) {
 
 function evaltags($php) {
 	global $_SGLOBAL;
-
+	
 	$_SGLOBAL['i']++;
 	$search = "<!--EVAL_TAG_{$_SGLOBAL['i']}-->";
 	$_SGLOBAL['block_search'][$_SGLOBAL['i']] = $search;
 	$_SGLOBAL['block_replace'][$_SGLOBAL['i']] = "<?php ".stripvtags($php)." ?>";
-	
+
 	return $search;
 }
 

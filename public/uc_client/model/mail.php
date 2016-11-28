@@ -18,10 +18,6 @@ class mailmodel {
 	var $apps;
 
 	function __construct(&$base) {
-		$this->mailmodel($base);
-	}
-
-	function mailmodel(&$base) {
 		$this->base = $base;
 		$this->db = $base->db;
 		$this->apps = &$this->base->cache['apps'];

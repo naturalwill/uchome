@@ -24,10 +24,6 @@ class notemodel {
 	var $notetype = 'HTTP';
 
 	function __construct(&$base) {
-		$this->notemodel($base);
-	}
-
-	function notemodel(&$base) {
 		$this->base = $base;
 		$this->db = $base->db;
 		$this->apps = $this->base->cache('apps');

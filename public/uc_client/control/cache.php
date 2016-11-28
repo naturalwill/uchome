@@ -12,10 +12,6 @@
 class cachecontrol extends base {
 
 	function __construct() {
-		$this->cachecontrol();
-	}
-
-	function cachecontrol() {
 		parent::__construct();
 	}
 

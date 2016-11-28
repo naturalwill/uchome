@@ -15,10 +15,6 @@ class appmodel {
 	var $base;
 
 	function __construct(&$base) {
-		$this->appmodel($base);
-	}
-
-	function appmodel(&$base) {
 		$this->base = $base;
 		$this->db = $base->db;
 	}

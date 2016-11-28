@@ -551,7 +551,9 @@ class Zip {
 		$this->magic_quotes_status = @get_magic_quotes_runtime();
 
 		if($this->magic_quotes_status == 1) {
-			@set_magic_quotes_runtime(0);
+			if(get_magic_quotes_runtime()){
+				@set_magic_quotes_runtime(0);
+			}
 		}
 		return $v_result;
 	}
@@ -565,7 +567,9 @@ class Zip {
 			return $v_result;
 		}
 		if($this->magic_quotes_status == 1) {
-			@set_magic_quotes_runtime($this->magic_quotes_status);
+			if(get_magic_quotes_runtime()){
+				@set_magic_quotes_runtime($this->magic_quotes_status);
+			}
 		}
 		return $v_result;
 	}
@@ -884,7 +888,7 @@ class SimpleUnzip {
                                   ($aP['FD']  & 0x001f),
                                   (($aP['FD'] & 0xfe00) >>  9) + 1980);
 
-                $this->Entries[] = &new SimpleUnzipEntry($aI);
+                $this->Entries[] = new SimpleUnzipEntry($aI);
             } // end for each entries
 
             return $this->Entries;

@@ -20,10 +20,6 @@ class usercontrol extends base {
 
 
 	function __construct() {
-		$this->usercontrol();
-	}
-
-	function usercontrol() {
 		parent::__construct();
 		$this->load('user');
 		$this->app = $this->cache['apps'][UC_APPID];

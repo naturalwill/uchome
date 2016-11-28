@@ -12,10 +12,6 @@
 class feedcontrol extends base {
 
 	function __construct() {
-		$this->feedcontrol();
-	}
-
-	function feedcontrol() {
 		parent::__construct();
 		$this->init_input();
 	}

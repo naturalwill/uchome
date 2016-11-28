@@ -49,7 +49,9 @@ if(defined('IN_UC')) {
 } else {
 
 	error_reporting(0);
-	set_magic_quotes_runtime(0);
+	if(get_magic_quotes_runtime()){
+		set_magic_quotes_runtime(0);
+	}
 
 	defined('MAGIC_QUOTES_GPC') || define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 

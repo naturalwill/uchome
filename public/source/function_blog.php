@@ -386,7 +386,7 @@ function checkhtml($html) {
 
 //视频标签处理
 function blog_bbcode($message) {
-	$message = preg_replace("/\[flash\=?(media|real)*\](.+?)\[\/flash\]/ie", "blog_flash('\\2', '\\1')", $message);
+	$message = preg_replace_callback("/\[flash\=?(media|real)*\](.+?)\[\/flash\]/i", function ($matches){return blog_flash($matches[2], $matches[1]);}, $message);
 	return $message;
 }
 //视频

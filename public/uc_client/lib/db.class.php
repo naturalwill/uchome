@@ -33,34 +33,33 @@ class ucclient_db {
 		$this->tablepre = $tablepre;
 		$this->time = $time;
 
-		if($pconnect) {
-			if(!$this->link = mysql_pconnect($dbhost, $dbuser, $dbpw)) {
-				$this->halt('Can not connect to MySQL server');
-			}
-		} else {
-			if(!$this->link = mysql_connect($dbhost, $dbuser, $dbpw)) {
-				$this->halt('Can not connect to MySQL server');
-			}
+	
+		if(!$this->link = mysqli_connect($dbhost, $dbuser, $dbpw)) {
+			$this->halt('Can not connect to MySQL server');
 		}
 
 		if($this->version() > '4.1') {
 			if($dbcharset) {
-				mysql_query("SET character_set_connection=".$dbcharset.", character_set_results=".$dbcharset.", character_set_client=binary", $this->link);
+				mysqli_query($this->link, "SET character_set_connection=".$dbcharset.", character_set_results=".$dbcharset.", character_set_client=binary");
 			}
 
 			if($this->version() > '5.0.1') {
-				mysql_query("SET sql_mode=''", $this->link);
+				mysqli_query($this->link, "SET sql_mode=''");
 			}
 		}
 
 		if($dbname) {
-			mysql_select_db($dbname, $this->link);
+			mysqli_select_db($this->link, $dbname);
 		}
 
 	}
 
-	function fetch_array($query, $result_type = MYSQL_ASSOC) {
-		return mysql_fetch_array($query, $result_type);
+	function escape_string($query) {
+		return mysqli_escape_string($this->link, $query);
+	}
+	
+	function fetch_array($query, $result_type = MYSQLI_ASSOC) {
+		return mysqli_fetch_array($query, $result_type);
 	}
 
 	function result_first($sql) {
@@ -87,8 +86,8 @@ class ucclient_db {
 	}
 
 	function query($sql, $type = '', $cachetime = FALSE) {
-		$func = $type == 'UNBUFFERED' && @function_exists('mysql_unbuffered_query') ? 'mysql_unbuffered_query' : 'mysql_query';
-		if(!($query = $func($sql, $this->link)) && $type != 'SILENT') {
+		$resultmode = $type == 'UNBUFFERED' ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT;
+		if(!($query =  mysqli_query($this->link, $sql, $resultmode)) && $type != 'SILENT') {
 			$this->halt('MySQL Query Error', $sql);
 		}
 		$this->querynum++;
@@ -97,59 +96,60 @@ class ucclient_db {
 	}
 
 	function affected_rows() {
-		return mysql_affected_rows($this->link);
+		return mysqli_affected_rows($this->link);
 	}
 
 	function error() {
-		return (($this->link) ? mysql_error($this->link) : mysql_error());
+		return (empty($this->link) ?'mysqli_link_empty': mysqli_error($this->link) );
 	}
 
 	function errno() {
-		return intval(($this->link) ? mysql_errno($this->link) : mysql_errno());
+		return empty($this->link) ?0: intval(mysqli_errno ($this->link) );
 	}
 
 	function result($query, $row) {
-		$query = @mysql_result($query, $row);
-		return $query;
+		mysqli_data_seek($query, $row);
+		$f = mysqli_fetch_array( $query );
+		return $f[0];
 	}
 
 	function num_rows($query) {
-		$query = mysql_num_rows($query);
+		$query = mysqli_num_rows($query);
 		return $query;
 	}
 
 	function num_fields($query) {
-		return mysql_num_fields($query);
+		return mysqli_num_fields($query);
 	}
 
 	function free_result($query) {
-		return mysql_free_result($query);
+		return mysqli_free_result($query);
 	}
 
 	function insert_id() {
-		return ($id = mysql_insert_id($this->link)) >= 0 ? $id : $this->result($this->query("SELECT last_insert_id()"), 0);
+		return ($id = mysqli_insert_id($this->link)) >= 0 ? $id : $this->result($this->query("SELECT last_insert_id()"), 0);
 	}
 
 	function fetch_row($query) {
-		$query = mysql_fetch_row($query);
+		$query = mysqli_fetch_row($query);
 		return $query;
 	}
 
 	function fetch_fields($query) {
-		return mysql_fetch_field($query);
+		return mysqli_fetch_field($query);
 	}
 
 	function version() {
-		return mysql_get_server_info($this->link);
+		return mysqli_get_server_info($this->link);
 	}
 
 	function close() {
-		return mysql_close($this->link);
+		return mysqli_close($this->link);
 	}
 
 	function halt($message = '', $sql = '') {
-		$error = mysql_error();
-		$errorno = mysql_errno();
+		$error = $this->error();
+		$errorno = $this->errno();
 		if($errorno == 2006 && $this->goneaway-- > 0) {
 			$this->connect($this->dbhost, $this->dbuser, $this->dbpw, $this->dbname, $this->dbcharset, $this->pconnect, $this->tablepre, $this->time);
 			$this->query($sql);
