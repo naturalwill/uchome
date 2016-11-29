@@ -883,10 +883,10 @@ function template($name) {
 			$tpl = "template/$_SCONFIG[template]/$name";
 		}
 		$objfile = S_ROOT.'./data/tpl_cache/'.str_replace('/','_',$tpl).'.php';
-		//if(!file_exists($objfile)) {
+		if(!file_exists($objfile)) {
 			include_once(S_ROOT.'./source/function_template.php');
 			parse_template($tpl);
-		//}
+		}
 	}
 	return $objfile;
 }
@@ -944,19 +944,34 @@ function ob_out() {
 	$preg_searchs = $preg_replaces = $str_searchs = $str_replaces = array();
 
 	if($_SCONFIG['allowrewrite']) {
-		$preg_searchs[] = "/\<a href\=\"space\.php\?(uid|do)+\=([a-z0-9\=\&]+?)\"/ie";
-		$preg_searchs[] = "/\<a href\=\"space.php\"/i";
-		$preg_searchs[] = "/\<a href\=\"network\.php\?ac\=([a-z0-9\=\&]+?)\"/ie";
-		$preg_searchs[] = "/\<a href\=\"network.php\"/i";
-
-		$preg_replaces[] = 'rewrite_url(\'space-\',\'\\2\')';
-		$preg_replaces[] = '<a href="space.html"';
-		$preg_replaces[] = 'rewrite_url(\'network-\',\'\\1\')';
-		$preg_replaces[] = '<a href="network.html"';
+			/*
+		 * $preg_searchs[] = "/\<a href\=\"space\.php\?(uid|do)+\=([a-z0-9\=\&]+?)\"/ie";
+		 * $preg_searchs[] = "/\<a href\=\"space.php\"/i";
+		 * $preg_searchs[] = "/\<a href\=\"network\.php\?ac\=([a-z0-9\=\&]+?)\"/ie";
+		 * $preg_searchs[] = "/\<a href\=\"network.php\"/i";
+		 *
+		 * $preg_replaces[] = 'rewrite_url(\'space-\',\'\\2\')';
+		 * $preg_replaces[] = '<a href="space.html"';
+		 * $preg_replaces[] = 'rewrite_url(\'network-\',\'\\1\')';
+		 * $preg_replaces[] = '<a href="network.html"';
+		 */
+		$content = preg_replace_callback ( "/\<a href\=\"space\.php\?(uid|do)+\=([a-z0-9\=\&]+?)\"/i", function ($matches) {
+			return rewrite_url ( 'space-', $matches [2] );
+		}, $content );
+		$content = preg_replace ( "/\<a href\=\"space.php\"/i", '<a href="space.html"', $content );
+		$content = preg_replace_callback ( "/\<a href\=\"network\.php\?ac\=([a-z0-9\=\&]+?)\"/i", function ($matches) {
+			return rewrite_url ( 'network-', $matches [1] );
+		}, $content );		
+		$content = preg_replace("/\<a href\=\"network.php\"/i", '<a href="network.html"', $content);
 	}
 	if($_SCONFIG['linkguide']) {
+		/*
 		$preg_searchs[] = "/\<a href\=\"http\:\/\/(.+?)\"/ie";
 		$preg_replaces[] = 'iframe_url(\'\\1\')';
+		*/
+		$content = preg_replace_callback( "/\<a href\=\"http\:\/\/(.+?)\"/i", function ($matches) {
+			return iframe_url ( $matches [1] );
+		}, $content );
 	}
 
 	if($_SGLOBAL['inajax']) {
@@ -973,17 +988,17 @@ function ob_out() {
 	if($str_searchs) {
 		$content = trim(str_replace($str_searchs, $str_replaces, $content));
 	}
-
-	obclean();
+	
+	obclean(); 
 	if($_SGLOBAL['inajax']) {
 		xml_out($content);
 	} else{
 		if($_SCONFIG['headercharset']) {
-			@header('Content-Type: text/html; charset='.$_SC['charset']);
+			header('Content-Type: text/html; charset='.$_SC['charset']);
 		}
 		echo $content;
 		if(D_BUG) {
-			@include_once(S_ROOT.'./source/inc_debug.php');
+			include_once(S_ROOT.'./source/inc_debug.php');
 		}
 	}
 }
