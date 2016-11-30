@@ -9,12 +9,22 @@ if(!defined('IN_UCHOME')) {
 }
 
 class tree {
-	var $data = array();
-	var $child = array(-1 => array());
-	var $layer = array(-1 => -1);
-	var $parent = array();
-	var $countid = 0;
-	function __construct() {}
+	var $data;
+	var $child;
+	var $layer;
+	var $parent;
+	var $countid;
+	function __construct() {
+		$this->data = array ();
+		$this->child = array (
+				- 1 => array () 
+		);
+		$this->layer = array (
+				- 1 => - 1 
+		);
+		$this->parent = array ();
+		$this->countid = 0;
+	}
 	
 	function setNode($id, $parent, $value) {
 		
@@ -84,4 +94,3 @@ class tree {
 	}
 }
 
-?>

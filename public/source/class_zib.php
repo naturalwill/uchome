@@ -544,17 +544,9 @@ class Zip {
 		if((!function_exists("get_magic_quotes_runtime")) || (!function_exists("set_magic_quotes_runtime"))) {
 			return $v_result;
 		}
-		if($this->magic_quotes_status != -1) {
-			return $v_result;
-		}
+		
+		$this->magic_quotes_status = 0;
 
-		$this->magic_quotes_status = @get_magic_quotes_runtime();
-
-		if($this->magic_quotes_status == 1) {
-			if(get_magic_quotes_runtime()){
-				@set_magic_quotes_runtime(0);
-			}
-		}
 		return $v_result;
 	}
 
@@ -563,14 +555,7 @@ class Zip {
 		if((!function_exists("get_magic_quotes_runtime")) || (!function_exists("set_magic_quotes_runtime"))) {
 			return $v_result;
 		}
-		if($this->magic_quotes_status != -1) {
-			return $v_result;
-		}
-		if($this->magic_quotes_status == 1) {
-			if(get_magic_quotes_runtime()){
-				@set_magic_quotes_runtime($this->magic_quotes_status);
-			}
-		}
+		
 		return $v_result;
 	}
 

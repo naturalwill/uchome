@@ -49,9 +49,7 @@ if(defined('IN_UC')) {
 } else {
 
 	error_reporting(0);
-	if(get_magic_quotes_runtime()){
-		set_magic_quotes_runtime(0);
-	}
+	//set_magic_quotes_runtime(0);
 
 	defined('MAGIC_QUOTES_GPC') || define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 
@@ -82,7 +80,8 @@ if(defined('IN_UC')) {
 
 	if(in_array($get['action'], array('test', 'deleteuser', 'renameuser', 'gettag', 'synlogin', 'synlogout', 'updatepw', 'updatebadwords', 'updatehosts', 'updateapps', 'updateclient', 'updatecredit', 'getcredit', 'getcreditsettings', 'updatecreditsettings', 'addfeed'))) {
 		$uc_note = new uc_note();
-		echo $uc_note->$get['action']($get, $post);
+		//$action=$get['action'];
+		echo $uc_note->{$get['action']}($get, $post);
 		exit();
 	} else {
 		exit(API_RETURN_FAILED);
@@ -104,7 +103,7 @@ class uc_note {
 		return xml_serialize($arr, $htmlon);
 	}
 
-	function uc_note() {
+	function __construct() {
 		global $_SGLOBAL, $_SC;
 		$this->appdir = substr(dirname(__FILE__), 0, -3);
 		$this->dbconfig = S_ROOT.'./config.php';

@@ -14,7 +14,7 @@ class APIResponse {
 
 	var $mode;
 
-	function APIResponse($res, $mode = null) {
+	function __construct($res, $mode = null) {
 		$this->result = $res;
 		$this->mode = $mode;
 	}

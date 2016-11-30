@@ -144,8 +144,8 @@ END;
 			//处理成功
 			$apphidden = '';
 			//验证是否可以直接联接MySQL
-			$link = mysql_connect($ucs[2], $ucs[4], $ucs[5], 1);
-			$connect = $link && mysql_select_db($ucs[3], $link) ? 'mysql' : '';
+			$link = mysqli_connect($ucs[2], $ucs[4], $ucs[5]);
+			$connect = $link && mysqli_select_db($link, $ucs[3]) ? 'mysql' : '';
 			//返回
 			foreach (array('key', 'appid', 'dbhost', 'dbname', 'dbuser', 'dbpw', 'dbcharset', 'dbtablepre', 'charset') as $key => $value) {
 				if($value == 'dbtablepre') {
@@ -217,15 +217,16 @@ END;
 
 	//判断UCenter Home数据库
 	$havedata = false;
-	if(!@mysql_connect($_POST['db']['dbhost'], $_POST['db']['dbuser'], $_POST['db']['dbpw'])) {
+	$link2=@mysqli_connect($_POST['db']['dbhost'], $_POST['db']['dbuser'], $_POST['db']['dbpw']);
+	if(!$link2) {
 		show_msg('数据库连接信息填写错误，请确认');
 	}
-	if(mysql_select_db($_POST['db']['dbname'])) {
-		if(mysql_query("SELECT COUNT(*) FROM {$_POST['db']['tablepre']}space")) {
+	if(mysqli_select_db($link2, $_POST['db']['dbname'])) {
+		if(mysqli_query($link2, "SELECT COUNT(*) FROM {$_POST['db']['tablepre']}space")) {
 			$havedata = true;
 		}
 	} else {
-		if(!mysql_query("CREATE DATABASE `".$_POST['db']['dbname']."`")) {
+		if(!mysqli_query($link2, "CREATE DATABASE `".$_POST['db']['dbname']."`")) {
 			show_msg('设定的UCenter Home数据库无权限操作，请先手工操作后，再执行安装程序');
 		}
 	}
@@ -546,7 +547,7 @@ END;
 	<option value="addoption" class="addoption">+自定义</option>
 	</select>
 	</td>
-	<td>MySQL版本>4.1有效</td>
+	<td>MySQL版本>5.0有效</td>
 	</tr>
 	<tr>
 	<td>数据库名:</td>
@@ -606,7 +607,7 @@ END;
 		}
 	}
 	if(!$installok) {
-		show_msg("<font color=\"blue\">数据表 ($tablename) 自动安装失败</font><br />反馈: ".mysql_error()."<br /><br />请参照 $sqlfile 文件中的SQL文，自己手工安装数据库后，再继续进行安装操作<br /><br /><a href=\"?step=$step\">重试</a>");
+		show_msg("<font color=\"blue\">数据表 ($tablename) 自动安装失败</font><br />反馈: ".$_SGLOBAL['db']->error()."<br /><br />请参照 $sqlfile 文件中的SQL文，自己手工安装数据库后，再继续进行安装操作<br /><br /><a href=\"?step=$step\">重试</a>");
 	} else {
 		show_msg('数据表已经全部安装完成，进入下一步操作', ($step+1), 1);
 	}

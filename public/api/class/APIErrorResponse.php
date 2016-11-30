@@ -15,7 +15,7 @@ class APIErrorResponse {
 	
 	var $errMessage = '';
 
-	function APIErrorResponse($errCode, $errMessage) {
+	function __construct($errCode, $errMessage) {
 		$this->errCode = $errCode;
 		$this->errMessage = $errMessage;
 	}
